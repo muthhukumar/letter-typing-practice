@@ -8,6 +8,8 @@ import {
   redirect,
   useLoaderData,
 } from 'remix'
+import Letter from '~/components/letter'
+import Status from '~/components/status'
 import { generateRandomString } from '~/utils'
 import { commitSession, getSession } from '~/utils/session.server'
 
@@ -126,17 +128,15 @@ export default function Index() {
   }
 
   return (
-    <div className="container max-w-6xl mx-auto">
-      {letters && letters[index] && (
-        <p className="my-8 text-6xl font-bold text-center">{letters[index]}</p>
-      )}
+    <div className="container max-w-xl p-8 mx-auto mt-20 border border-yellow-400 shadow-xl rounded-xl">
+      {letters && letters[index] && <Letter>{letters[index]}</Letter>}
       <input
         name="letter"
         type="text"
         onChange={handleChange}
         value={input}
         autoComplete="off"
-        className="rounded-md"
+        className="mx-auto rounded-md fit-content"
       />
 
       <div>Errors: {errors}</div>
@@ -187,7 +187,9 @@ export default function Index() {
           />
           Use Symbols
         </label>
-        <button>Save Options</button>
+        <button className="w-full py-4 my-4 text-sm font-bold bg-yellow-500 rounded-md">
+          Save Options
+        </button>
       </Form>
     </div>
   )

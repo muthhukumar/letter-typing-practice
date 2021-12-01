@@ -48,7 +48,7 @@ function Document({ children, title }: { children: React.ReactNode; title?: stri
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="bg-black">
         <Scripts />
         {children}
         <RouteChangeAnnouncement />

@@ -7,8 +7,10 @@ import {
   MetaFunction,
   redirect,
   useLoaderData,
+  useTransition,
 } from 'remix'
 import Letter from '~/components/letter'
+import Stack from '~/components/stack'
 import Status from '~/components/status'
 import { generateRandomString } from '~/utils'
 import { commitSession, getSession } from '~/utils/session.server'
@@ -88,6 +90,8 @@ const isLastIndex = (index: number, items: Array<any>) => {
 }
 
 export default function Index() {
+  const transition = useTransition()
+
   const { randomStrings, typingOptions } = useLoaderData<LoaderData>()
 
   const [index, setIndex] = React.useState(0)
@@ -136,14 +140,20 @@ export default function Index() {
         onChange={handleChange}
         value={input}
         autoComplete="off"
-        className="mx-auto rounded-md fit-content"
+        className="p-2 mx-auto mb-8 rounded-md fit-content"
       />
 
-      <div>Errors: {errors}</div>
-      <div>Typed: {typed}</div>
-      <h2>Options</h2>
-      <Form className="flex flex-col items-start" method="post">
-        <label htmlFor="Lowercase">
+      <Stack>
+        <Status title="Typed" value={typed} />
+        <Status title="Error" value={errors} />
+      </Stack>
+
+      <div className="flex items-center justify-start">
+        <span className="ml-2"></span>
+      </div>
+      <h2 className="mt-6 text-xl font-bold">Options</h2>
+      <Form className="flex flex-col items-start mt-2" method="post">
+        <Stack>
           <input
             type="checkbox"
             id="Lowercase"
@@ -152,9 +162,9 @@ export default function Index() {
             checked={lowercaseAlphabets}
             onChange={() => setLowercase((state) => !state)}
           />
-          Use Lowercase
-        </label>
-        <label htmlFor="Uppercase">
+          <label htmlFor="Lowercase">use lowercase</label>
+        </Stack>
+        <Stack>
           <input
             type="checkbox"
             id="Uppercase"
@@ -163,9 +173,10 @@ export default function Index() {
             checked={uppercaseAlphabets}
             onChange={() => setUppercase((state) => !state)}
           />
-          Use Uppercase
-        </label>
-        <label htmlFor="Numbers">
+
+          <label htmlFor="Uppercase">use uppercase</label>
+        </Stack>
+        <Stack>
           <input
             type="checkbox"
             id="Numbers"
@@ -174,9 +185,9 @@ export default function Index() {
             checked={numbers}
             onChange={() => setNumbers((state) => !state)}
           />
-          Use Numbers
-        </label>
-        <label htmlFor="Symbols">
+          <label htmlFor="Numbers">use numbers</label>
+        </Stack>
+        <Stack>
           <input
             type="checkbox"
             id="Symbols"
@@ -185,10 +196,10 @@ export default function Index() {
             checked={symbols}
             onChange={() => setSymbols((state) => !state)}
           />
-          Use Symbols
-        </label>
+          <label htmlFor="Symbols">use symbols</label>
+        </Stack>
         <button className="w-full py-4 my-4 text-sm font-bold bg-yellow-500 rounded-md">
-          Save Options
+          {transition.state === 'submitting' ? 'Saving...' : 'Save Options'}
         </button>
       </Form>
     </div>

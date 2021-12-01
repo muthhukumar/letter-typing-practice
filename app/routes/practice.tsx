@@ -12,8 +12,8 @@ import { generateRandomString } from '~/utils'
 import { commitSession, getSession } from '~/utils/session.server'
 
 type TypingOptions = {
-  lowercase: boolean
-  uppercase: boolean
+  lowercaseAlphabets: boolean
+  uppercaseAlphabets: boolean
   numbers: boolean
   symbols: boolean
 }
@@ -36,14 +36,14 @@ export const action: ActionFunction = async ({ request }) => {
 
   const session = await getSession(request.headers.get('Cookie'))
 
-  const lowercase = formData.get('Lowercase') ?? true
-  const uppercase = formData.get('Uppercase') ?? false
-  const numbers = formData.get('Numbers') ?? false
-  const symbols = formData.get('Symbols') ?? false
+  const lowercaseAlphabets = Boolean(formData.get('Lowercase')) ?? true
+  const uppercaseAlphabets = Boolean(formData.get('Uppercase')) ?? false
+  const numbers = Boolean(formData.get('Numbers')) ?? false
+  const symbols = Boolean(formData.get('Symbols')) ?? false
 
   session.set(TYPING_OPTION_KEY, {
-    lowercase,
-    uppercase,
+    lowercaseAlphabets,
+    uppercaseAlphabets,
     numbers,
     symbols,
   })
@@ -57,31 +57,27 @@ export const action: ActionFunction = async ({ request }) => {
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const formData = await request.formData()
-
   const session = await getSession(request.headers.get('Cookie'))
 
-  const typingOptions = session.get(TYPING_OPTION_KEY)
+  const typingOptionsFromSession = session.get(TYPING_OPTION_KEY)
 
-  const lowercase = typingOptions.get('Lowercase') ?? true
-  const uppercase = typingOptions.get('Uppercase') ?? false
-  const numbers = typingOptions.get('Numbers') ?? false
-  const symbols = typingOptions.get('Symbols') ?? false
+  const typingOptions = {
+    lowercaseAlphabets: true,
+    uppercaseAlphabets: false,
+    numbers: false,
+    symbols: false,
+  }
+
+  if (typingOptionsFromSession) {
+    typingOptions.lowercaseAlphabets = typingOptionsFromSession.lowercaseAlphabets ?? true
+    typingOptions.uppercaseAlphabets = typingOptionsFromSession.uppercaseAlphabets ?? false
+    typingOptions.numbers = typingOptionsFromSession.numbers ?? false
+    typingOptions.symbols = typingOptionsFromSession.symbols ?? false
+  }
 
   return json({
-    randomStrings: generateRandomString({
-      length: 1,
-      lowercaseAlphabets: true,
-      numbers: false,
-      symbols: false,
-      uppercaseAlphabets: false,
-    }).split(''),
-    typingOptions: {
-      lowercase,
-      uppercase,
-      numbers,
-      symbols,
-    },
+    randomStrings: generateRandomString({ ...typingOptions, length: 1 }).split(''),
+    typingOptions,
   })
 }
 
@@ -95,8 +91,8 @@ export default function Index() {
   const [index, setIndex] = React.useState(0)
   const [errors, setErrors] = React.useState(0)
   const [typed, setTyped] = React.useState(0)
-  const [lowercase, setLowercase] = React.useState(typingOptions.lowercase)
-  const [uppercase, setUppercase] = React.useState(typingOptions.uppercase)
+  const [lowercaseAlphabets, setLowercase] = React.useState(typingOptions.lowercaseAlphabets)
+  const [uppercaseAlphabets, setUppercase] = React.useState(typingOptions.uppercaseAlphabets)
   const [numbers, setNumbers] = React.useState(typingOptions.numbers)
   const [symbols, setSymbols] = React.useState(typingOptions.symbols)
 
@@ -113,14 +109,13 @@ export default function Index() {
       if (!isLastIndex(index, letters)) {
         setIndex((state) => state + 1)
       }
-      console.log('here')
       setLetters(
         generateRandomString({
           length: 1,
-          lowercaseAlphabets: lowercase,
+          lowercaseAlphabets: lowercaseAlphabets,
           numbers: numbers,
           symbols: symbols,
-          uppercaseAlphabets: uppercase,
+          uppercaseAlphabets: uppercaseAlphabets,
         }).split(''),
       )
       setIndex(0)
@@ -147,14 +142,14 @@ export default function Index() {
       <div>Errors: {errors}</div>
       <div>Typed: {typed}</div>
       <h2>Options</h2>
-      <Form className="flex flex-col items-start" action="post">
+      <Form className="flex flex-col items-start" method="post">
         <label htmlFor="Lowercase">
           <input
             type="checkbox"
             id="Lowercase"
             name="Lowercase"
-            value="Lowercase"
-            checked={lowercase}
+            value="true"
+            checked={lowercaseAlphabets}
             onChange={() => setLowercase((state) => !state)}
           />
           Use Lowercase
@@ -164,8 +159,8 @@ export default function Index() {
             type="checkbox"
             id="Uppercase"
             name="Uppercase"
-            value="Uppercase"
-            checked={uppercase}
+            value="true"
+            checked={uppercaseAlphabets}
             onChange={() => setUppercase((state) => !state)}
           />
           Use Uppercase
@@ -175,7 +170,7 @@ export default function Index() {
             type="checkbox"
             id="Numbers"
             name="Numbers"
-            value="Numbers"
+            value="true"
             checked={numbers}
             onChange={() => setNumbers((state) => !state)}
           />
@@ -186,12 +181,13 @@ export default function Index() {
             type="checkbox"
             id="Symbols"
             name="Symbols"
-            value="Symbols"
+            value="true"
             checked={symbols}
             onChange={() => setSymbols((state) => !state)}
           />
           Use Symbols
         </label>
+        <button>Save Options</button>
       </Form>
     </div>
   )

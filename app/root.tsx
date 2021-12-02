@@ -4,8 +4,6 @@ import type { LinksFunction } from 'remix'
 
 import ReactGA from 'react-ga'
 
-ReactGA.initialize('UA-000000-01')
-
 import globalStylesUrl from '~/styles/global.css'
 import tailwindcss from '~/styles/tailwind.css'
 import darkStylesUrl from '~/styles/dark.css'
@@ -32,10 +30,6 @@ export const links: LinksFunction = () => {
 }
 
 export default function App() {
-  React.useEffect(() => {
-    ReactGA.pageview(window.location.pathname + window.location.search)
-  }, [])
-
   return (
     <Document>
       <Layout>
@@ -46,6 +40,10 @@ export default function App() {
 }
 
 function Document({ children, title }: { children: React.ReactNode; title?: string }) {
+  React.useEffect(() => {
+    ReactGA.initialize('G-DLLT7VDSWP')
+    ReactGA.pageview(window.location.pathname + window.location.search)
+  }, [])
   return (
     <html lang="en">
       <head>

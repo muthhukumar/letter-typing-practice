@@ -11,7 +11,7 @@ interface StringValuesType {
   numbers: Array<number>
 }
 
-interface StringOptions {
+export interface StringOptions {
   length: number
   uppercaseAlphabets: boolean
   lowercaseAlphabets: boolean
@@ -103,6 +103,11 @@ const generateRandomString = (options: StringOptions) => {
           return false
         },
       )
+
+      if (Object.keys(stringOptionsValueClone).length === 0) {
+        return []
+      }
+
       const stringOptionIndex = getRandomIntBetweenRange(0, stringOptionKeys.length - 1)
 
       const stringOption = stringOptionKeys[stringOptionIndex] as StringValueKeysType

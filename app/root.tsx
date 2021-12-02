@@ -1,30 +1,29 @@
 import * as React from 'react'
-import {
-  Links,
-  LiveReload,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-  useCatch,
-  useLocation,
-} from 'remix'
+import { Links, LiveReload, Meta, MetaFunction, Outlet, Scripts, useCatch } from 'remix'
 import type { LinksFunction } from 'remix'
 
 import globalStylesUrl from '~/styles/global.css'
+import tailwindcss from '~/styles/tailwind.css'
 import darkStylesUrl from '~/styles/dark.css'
-import tailwindcss from './styles/tailwind.css'
 import Navbar from './components/navbar'
+
+export const meta: MetaFunction = () => {
+  return {
+    title: 'LTP | Letter typing practice',
+    description:
+      'Letter typing practice allows you to practice individual characters rather than typing the entire word. It is important to have good muscle memory of each keys then typing entire word quickly.',
+  }
+}
 
 export const links: LinksFunction = () => {
   return [
     { rel: 'stylesheet', href: globalStylesUrl },
+    { rel: 'stylesheet', href: tailwindcss },
     {
       rel: 'stylesheet',
       href: darkStylesUrl,
       media: '(prefers-color-scheme: dark)',
     },
-    { rel: 'stylesheet', href: tailwindcss },
   ]
 }
 
@@ -48,11 +47,9 @@ function Document({ children, title }: { children: React.ReactNode; title?: stri
         <Meta />
         <Links />
       </head>
-      <body className="bg-black">
+      <body className="text-white bg-black">
         <Scripts />
         {children}
-        <RouteChangeAnnouncement />
-        <ScrollRestoration />
         {process.env.NODE_ENV === 'development' && <LiveReload />}
       </body>
     </html>
@@ -61,11 +58,52 @@ function Document({ children, title }: { children: React.ReactNode; title?: stri
 
 function Layout({ children }: React.PropsWithChildren<Record<string, unknown>>) {
   return (
-    <div className="h-full">
+    <div className="container max-w-6xl">
       <Navbar />
-      <div className="flex h-full">
-        <div className="w-full h-full">{children}</div>
-      </div>
+      <main>{children}</main>
+      <article className="container max-w-2xl text-sm">
+        <h4 className="mt-4 mb-2 text-xl font-bold">What is letter typing practice?</h4>
+        <p className="mb-1">
+          Letter typing practice allows you to practice individual characters rather than typing the
+          entire word. It is important to have good muscle memory of each keys then typing entire
+          word quickly.import {darkStylesUrl} from '~/styles/dark.css';
+        </p>
+        <p>That is the main motivation behind building the Letter typing practice site.</p>
+
+        <h4 className="mt-4 mb-2 text-xl font-bold">How to use Letter typing practice?</h4>
+        <p className="mb-1">
+          Letters are randomly generated and displayed on the screen at the top inside the gray
+          circle. Now you should click the input and type the corresponding key in the keyboard.
+        </p>
+        <p className="mb-1">
+          If the correct key is pressed new letter will be displayed on the screen. If the correct
+          key is not pressed then the letter will not change.
+        </p>
+        <p>
+          Options allows you to customize the letters you what to practice. You can choose between
+          capital letters, lowercase letters, symbols and even numbers.
+        </p>
+      </article>
+      <footer className="container flex items-start justify-between max-w-2xl py-6 mt-8 border-t border-gray-400">
+        <div className="flex flex-col items-start">
+          <h1 className="mb-1 font-bold text-yellow-400">Letter Typing Practice</h1>
+          <p className="text-sm text-gray-400">
+            &copy; 2021-present Muthukumar. All rights Reserved.
+          </p>
+        </div>
+        <div className="flex flex-col items-start text-sm">
+          <h2 className="mb-1 font-bold">Links</h2>
+          <p>
+            <a href="https://rd.nullish.in/github">Github</a>
+          </p>
+          <p>
+            <a href="https://rd.nullish.in/twitter">Twitter</a>
+          </p>
+          <p>
+            <a href="https://github.com/muthhukumar/letter-typing-practice">Source code</a>
+          </p>
+        </div>
+      </footer>
     </div>
   )
 }
@@ -113,58 +151,3 @@ export function ErrorBoundary({ error }: { error: Error }) {
     </Document>
   )
 }
-
-/**
- * Provides an alert for screen reader users when the route changes.
- */
-const RouteChangeAnnouncement = React.memo(() => {
-  const [hydrated, setHydrated] = React.useState(false)
-  const [innerHtml, setInnerHtml] = React.useState('')
-  const location = useLocation()
-
-  React.useEffect(() => {
-    setHydrated(true)
-  }, [])
-
-  const firstRenderRef = React.useRef(true)
-  React.useEffect(() => {
-    // Skip the first render because we don't want an announcement on the
-    // initial page load.
-    if (firstRenderRef.current) {
-      firstRenderRef.current = false
-      return
-    }
-
-    const pageTitle = location.pathname === '/' ? 'Home page' : document.title
-    setInnerHtml(`Navigated to ${pageTitle}`)
-  }, [location.pathname])
-
-  // Render nothing on the server. The live region provides no value unless
-  // scripts are loaded and the browser takes over normal routing.
-  if (!hydrated) {
-    return null
-  }
-
-  return (
-    <div
-      aria-live="assertive"
-      aria-atomic
-      id="route-change-region"
-      style={{
-        border: '0',
-        clipPath: 'inset(100%)',
-        clip: 'rect(0 0 0 0)',
-        height: '1px',
-        margin: '-1px',
-        overflow: 'hidden',
-        padding: '0',
-        position: 'absolute',
-        width: '1px',
-        whiteSpace: 'nowrap',
-        wordWrap: 'normal',
-      }}
-    >
-      {innerHtml}
-    </div>
-  )
-})

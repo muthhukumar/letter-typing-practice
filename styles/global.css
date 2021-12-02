@@ -97,11 +97,6 @@ input:where([type='search']) {
   margin-left: auto;
 }
 
-html,
-body {
-  height: 100%;
-}
-
 .fit-content {
   width: fit-content;
   width: -moz-fit-content;

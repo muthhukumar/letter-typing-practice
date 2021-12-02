@@ -2,6 +2,10 @@ import * as React from 'react'
 import { Links, LiveReload, Meta, MetaFunction, Outlet, Scripts, useCatch } from 'remix'
 import type { LinksFunction } from 'remix'
 
+import ReactGA from 'react-ga'
+
+ReactGA.initialize('UA-000000-01')
+
 import globalStylesUrl from '~/styles/global.css'
 import tailwindcss from '~/styles/tailwind.css'
 import darkStylesUrl from '~/styles/dark.css'
@@ -28,6 +32,10 @@ export const links: LinksFunction = () => {
 }
 
 export default function App() {
+  React.useEffect(() => {
+    ReactGA.pageview(window.location.pathname + window.location.search)
+  }, [])
+
   return (
     <Document>
       <Layout>
@@ -66,7 +74,7 @@ function Layout({ children }: React.PropsWithChildren<Record<string, unknown>>) 
         <p className="mb-1">
           Letter typing practice allows you to practice individual characters rather than typing the
           entire word. It is important to have good muscle memory of each keys then typing entire
-          word quickly.import {darkStylesUrl} from '~/styles/dark.css';
+          word quickly.
         </p>
         <p>That is the main motivation behind building the Letter typing practice site.</p>
 

@@ -96,6 +96,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 }
 
 export default function Index() {
+
   const transition = useTransition()
 
   const { randomStrings, typingOptions } = useLoaderData<LoaderData>()

@@ -33,7 +33,8 @@ const TYPING_OPTION_KEY = 'typingOptions'
 export const meta: MetaFunction = () => {
   return {
     title: 'LTP | Letter typing practice',
-    description: 'Welcome to remix!',
+    description:
+      'Letter typing practice allows you to practice individual characters rather than typing the entire word. It is important to have good muscle memory of each keys then typing entire word quickly.',
   }
 }
 
@@ -96,7 +97,6 @@ export const loader: LoaderFunction = async ({ request }) => {
 }
 
 export default function Index() {
-
   const transition = useTransition()
 
   const { randomStrings, typingOptions } = useLoaderData<LoaderData>()
